@@ -1,6 +1,6 @@
 # AAR
 
-Simple API authentication result
+Simple **A**PI **A**uthentication **R**esult
 
 ## Usage
 ```go

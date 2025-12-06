@@ -16,10 +16,10 @@ type AAR struct {
 	duration time.Duration // Cached expiration time
 }
 
-func New(name string, args ...string) (*AAR, error) {
+func New(name string, args ...any) (*AAR, error) {
 	aar := &AAR{}
 	if len(args) != 0 {
-		name = fmt.Sprintf(name, args)
+		name = fmt.Sprintf(name, args...)
 	}
 	h := md5.New()
 	_, err := io.WriteString(h, name)
@@ -27,12 +27,12 @@ func New(name string, args ...string) (*AAR, error) {
 		return nil, err
 	}
 	aar.filename = path.Join(os.TempDir(), fmt.Sprintf("%x", h.Sum(nil)))
-	return aar, nil
+	return aar, err
 }
 
-// SetDuration set expiration time if you know specific hours
-func (aar *AAR) SetDuration(hours int) *AAR {
-	aar.duration = time.Duration(hours)
+// SetDuration set expiration time
+func (aar *AAR) SetDuration(d time.Duration) *AAR {
+	aar.duration = d
 	return aar
 }
 
@@ -48,8 +48,7 @@ func (aar *AAR) Read() (string, error) {
 	var err error
 	if finfo, err = os.Stat(aar.filename); !os.IsNotExist(err) &&
 		!finfo.IsDir() &&
-		finfo.Size() > 0 &&
-		finfo.ModTime().Add(aar.duration*time.Hour).After(time.Now()) {
+		finfo.ModTime().Add(aar.duration).After(time.Now()) {
 		var b []byte
 		if b, err = os.ReadFile(aar.filename); err == nil {
 			return string(b), nil

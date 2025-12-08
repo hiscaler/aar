@@ -48,6 +48,7 @@ func (aar *AAR) Read() (string, error) {
 	var err error
 	if finfo, err = os.Stat(aar.filename); !os.IsNotExist(err) &&
 		!finfo.IsDir() &&
+		finfo.Size() > 0 &&
 		finfo.ModTime().Add(aar.duration).After(time.Now()) {
 		var b []byte
 		if b, err = os.ReadFile(aar.filename); err == nil {

@@ -194,4 +194,16 @@ func TestRead(t *testing.T) {
 	if content != "abcd" {
 		t.Errorf("读取内容不匹配, 期望值: abcd, 实际值: %s", content)
 	}
+
+	err = aar.Write([]byte(""))
+	if err != nil {
+		t.Fatalf("写入缓存失败: %v", err)
+	}
+	content, err = aar.SetDuration(1 * time.Minute).Read()
+	if err == nil {
+		t.Fatal("期望读取失败，因为存储的值为空，实际读取成功")
+	}
+	if content != "" {
+		t.Errorf("读取内容不匹配, 期望值为空, 实际值: %s", content)
+	}
 }
